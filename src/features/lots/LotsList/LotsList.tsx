@@ -2,11 +2,10 @@ import React, { useEffect } from 'react';
 import styles from './styles.module.scss';
 import { useAppDispatch } from '../../../shared/helpers/dispatch';
 import {
-    deleteLotAsync,
     fetchLotsAsync,
-    hideDrawer,
     showDrawer,
     showEditDrawer,
+    hideDrawer,
     hideEditDrawer
 } from '../../../entities/lots/slice/lotsSlice';
 import { useSelector } from 'react-redux';
@@ -33,10 +32,6 @@ export const LotsList = () => {
         dispatch(hideDrawer());
     };
 
-    const handleDelete = (id: string) => {
-        dispatch(deleteLotAsync(id));
-    };
-
     const handleShowEditLot = (lot: ILot) => {
         dispatch(showEditDrawer(lot));
     };
@@ -49,19 +44,7 @@ export const LotsList = () => {
         <div className={styles.lotsList}>
             {lots && lots.map((lot) => (
                 <div key={lot.id} className={styles.lotsList__item}>
-                    <LotsCard
-                        name={lot.name}
-                        term={lot.term}
-                        payment={lot.payment}
-                        startDate={lot.startDate}
-                        timeLeftForLot={lot.timeLeft}
-                    />
-                    <Button type="primary" onClick={() => handleShowEditLot(lot)}>
-                        Edit
-                    </Button>
-                    <Button type="primary" danger onClick={() => handleDelete(lot.id)}>
-                        Delete
-                    </Button>
+                    <LotsCard lot={lot} onEdit={handleShowEditLot} />
                 </div>
             ))}
             <Button onClick={handleShowCreateLot}>

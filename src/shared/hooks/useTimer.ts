@@ -1,20 +1,21 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
-export const useTimer = () => {
-    const [timeLeft, setTimeLeft] = useState(0);
-    let intervalId: NodeJS.Timeout | null = null;
+export const useTimer = (initialValue: number = 0) => {
+    const [timeLeft, setTimeLeft] = useState(initialValue);
+    const intervalIdRef = useRef<NodeJS.Timeout | null>(null);
 
     const startTimer = useCallback((initialTime: number) => {
         setTimeLeft(initialTime);
 
-        if (intervalId) {
-            clearInterval(intervalId);
+        if (intervalIdRef.current) {
+            clearInterval(intervalIdRef.current);
         }
 
-        intervalId = setInterval(() => {
+        intervalIdRef.current = setInterval(() => {
             setTimeLeft(prevTime => {
                 if (prevTime <= 1) {
-                    clearInterval(intervalId!);
+                    clearInterval(intervalIdRef.current!);
+                    intervalIdRef.current = null;
                     return 0;
                 }
                 return prevTime - 1;
@@ -22,13 +23,20 @@ export const useTimer = () => {
         }, 1000);
     }, []);
 
+    const stopTimer = useCallback(() => {
+        if (intervalIdRef.current) {
+            clearInterval(intervalIdRef.current);
+            intervalIdRef.current = null;
+        }
+    }, []);
+
     useEffect(() => {
         return () => {
-            if (intervalId) {
-                clearInterval(intervalId);
+            if (intervalIdRef.current) {
+                clearInterval(intervalIdRef.current);
             }
         };
     }, []);
 
-    return { timeLeft, startTimer };
+    return { timeLeft, startTimer, stopTimer };
 };

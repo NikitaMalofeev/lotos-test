@@ -1,27 +1,51 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './style.module.scss';
 import { useTimer } from '../../../shared/hooks/useTimer';
+import { Button, Space } from 'antd';
+import { EditOutlined, DeleteOutlined, PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons';
+import { useAppDispatch } from '../../../shared/helpers/dispatch';
+import { deleteLotAsync, editLotStatus, updateLotStatusAsync } from '../../../entities/lots/slice/lotsSlice';
+import { ILot } from '../../../entities/lots/model/lotsTypes';
 
 interface LotsCardProps {
-    name: string;
-    term: string;
-    payment: string;
-    startDate: number;
-    timeLeftForLot: number;
+    lot: ILot;
+    onEdit: (lot: ILot) => void;
 }
 
-export const LotsCard: React.FC<LotsCardProps> = ({ name, term, payment, startDate, timeLeftForLot }) => {
-    const { timeLeft, startTimer } = useTimer();
+export const LotsCard: React.FC<LotsCardProps> = ({ lot, onEdit }) => {
+    const { name, term, payment, startDate, timeLeft: initialTimeLeft, status, id } = lot;
+    const { timeLeft, startTimer, stopTimer } = useTimer(initialTimeLeft);
+    const dispatch = useAppDispatch();
+    const [isTimerRunning, setIsTimerRunning] = useState(status === 'active');
 
     useEffect(() => {
-        startTimer(timeLeftForLot);
-    }, [startTimer, timeLeftForLot]);
+        if (status === 'active' && initialTimeLeft > 0) {
+            startTimer(initialTimeLeft);
+            setIsTimerRunning(true);
+        }
+    }, [status, initialTimeLeft, startTimer]);
+
+    const handleDelete = () => {
+        dispatch(deleteLotAsync(id));
+    };
+
+    const handleStartPause = () => {
+        if (status !== 'active') {
+            dispatch(editLotStatus({ id, status: 'active' }));
+            dispatch(updateLotStatusAsync({ id, status: 'active' }));
+            startTimer(timeLeft || initialTimeLeft);
+            setIsTimerRunning(true);
+        } else {
+            stopTimer();
+            dispatch(editLotStatus({ id, status: 'paused' }));
+            dispatch(updateLotStatusAsync({ id, status: 'paused' }));
+            setIsTimerRunning(false);
+        }
+    };
 
     const formatDate = (timestamp: number): string => {
         const date = new Date(timestamp * 1000);
-        const formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')}`;
-        const formattedTime = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
-        return `${formattedDate} ${formattedTime}`;
+        return `${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
     };
 
     const formatTime = (seconds: number): string => {
@@ -42,6 +66,14 @@ export const LotsCard: React.FC<LotsCardProps> = ({ name, term, payment, startDa
                 <span className={styles.lotsCard__timer}>
                     Time Left: {formatTime(timeLeft)}
                 </span>
+                <Space className={styles.lotsCard__actions}>
+                    <Button icon={<EditOutlined />} onClick={() => onEdit(lot)} />
+                    <Button
+                        icon={isTimerRunning ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+                        onClick={handleStartPause}
+                    />
+                    <Button icon={<DeleteOutlined />} danger onClick={handleDelete} />
+                </Space>
             </div>
         </div>
     );

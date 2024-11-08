@@ -9,24 +9,23 @@ interface CreateLotDrawerProps {
 }
 
 const CreateLotDrawer: React.FC<CreateLotDrawerProps> = ({ visible, onClose }) => {
-    const [name, setName] = useState('');
-    const [term, setTerm] = useState('');
-    const [payment, setPayment] = useState('');
+    const [form] = Form.useForm();
     const dispatch = useAppDispatch();
 
     const handleCreateLot = async () => {
-        const newLot = {
-            name,
-            term,
-            payment,
-            startDate: Math.floor(Date.now() / 1000), // current timestamp
-        };
-
         try {
+            const values = await form.validateFields();
+            const newLot = {
+                name: values.name,
+                term: values.term,
+                payment: values.payment,
+                startDate: Math.floor(Date.now() / 1000),
+            };
+
             await dispatch(createLotAsync(newLot)).unwrap();
-            onClose(); // Close drawer after successful creation
+            onClose();
         } catch (err) {
-            console.error('Error creating lot:', err);
+            console.error('Error creating lot or validation failed:', err);
         }
     };
 
@@ -38,27 +37,27 @@ const CreateLotDrawer: React.FC<CreateLotDrawerProps> = ({ visible, onClose }) =
             open={visible}
             onClose={onClose}
         >
-            <Form layout="vertical">
-                <Form.Item label="Name">
-                    <Input
-                        placeholder="Enter lot name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
+            <Form form={form} layout="vertical">
+                <Form.Item
+                    label="Name"
+                    name="name"
+                    rules={[{ required: true, message: 'Please enter the lot name' }]}
+                >
+                    <Input placeholder="Enter lot name" />
                 </Form.Item>
-                <Form.Item label="Term">
-                    <Input
-                        placeholder="Enter term"
-                        value={term}
-                        onChange={(e) => setTerm(e.target.value)}
-                    />
+                <Form.Item
+                    label="Term"
+                    name="term"
+                    rules={[{ required: true, message: 'Please enter the term' }]}
+                >
+                    <Input placeholder="Enter term" />
                 </Form.Item>
-                <Form.Item label="Payment">
-                    <Input
-                        placeholder="Enter payment"
-                        value={payment}
-                        onChange={(e) => setPayment(e.target.value)}
-                    />
+                <Form.Item
+                    label="Payment"
+                    name="payment"
+                    rules={[{ required: true, message: 'Please enter the payment' }]}
+                >
+                    <Input placeholder="Enter payment" />
                 </Form.Item>
                 <Form.Item>
                     <Space>

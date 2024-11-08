@@ -5,6 +5,7 @@ import { useAppDispatch } from '../../../shared/helpers/dispatch';
 import { createLotFromApi } from '../../../shared/api/lots/createLotFromApi';
 import { deleteLotFromApi } from '../../../shared/api/lots/deleteLotFromApi';
 import { updateLotFromApi } from '../../../shared/api/lots/updateLotFromApi';
+import { updateLotStatusFromApi } from '../../../shared/api/lots/updateLotStatusFromApi';
 
 
 interface LotsState {
@@ -50,6 +51,16 @@ export const editLotAsync = createAsyncThunk('lots/editLot', async ({ id, update
     return data;
 });
 
+export const updateLotStatusAsync = createAsyncThunk(
+    'lots/updateLotStatus',
+    async ({ id, status }: { id: string, status: 'active' | 'paused' }, { dispatch }) => {
+        const data = await updateLotStatusFromApi(id, status);
+        dispatch(editLotStatus({ id, status: data.status }));
+        return data;
+    }
+);
+
+
 const lotsSlice = createSlice({
     name: 'lots',
     initialState,
@@ -75,6 +86,12 @@ const lotsSlice = createSlice({
                 state.lots[index] = action.payload;
             }
         },
+        editLotStatus: (state, action: PayloadAction<{ id: string, status: 'active' | 'paused' }>) => {
+            const index = state.lots.findIndex(lot => lot.id === action.payload.id);
+            if (index !== -1) {
+                state.lots[index].status = action.payload.status;
+            }
+        },
         showEditDrawer: (state, action: PayloadAction<ILot>) => {
             state.editLotDrawerVisible = true;
             state.selectedLot = action.payload;
@@ -86,5 +103,5 @@ const lotsSlice = createSlice({
     },
 });
 
-export const { setLots, addLot, showDrawer, hideDrawer, removeLot, editLot, showEditDrawer, hideEditDrawer } = lotsSlice.actions;
+export const { setLots, addLot, showDrawer, hideDrawer, removeLot, editLot, showEditDrawer, hideEditDrawer, editLotStatus } = lotsSlice.actions;
 export default lotsSlice.reducer;
