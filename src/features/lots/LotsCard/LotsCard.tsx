@@ -6,6 +6,8 @@ import { EditOutlined, DeleteOutlined, PlayCircleOutlined, PauseCircleOutlined }
 import { useAppDispatch } from '../../../shared/helpers/dispatch';
 import { deleteLotAsync, editLotStatus, updateLotStatusAsync } from '../../../entities/lots/slice/lotsSlice';
 import { ILot } from '../../../entities/lots/model/lotsTypes';
+import { useNavigate } from 'react-router-dom';
+import { setLot } from '../../../entities/trading/slice/tradingSlice';
 
 interface LotsCardProps {
     lot: ILot;
@@ -17,6 +19,13 @@ export const LotsCard: React.FC<LotsCardProps> = ({ lot, onEdit }) => {
     const { timeLeft, startTimer, stopTimer } = useTimer(initialTimeLeft);
     const dispatch = useAppDispatch();
     const [isTimerRunning, setIsTimerRunning] = useState(status === 'active');
+
+    const navigate = useNavigate();
+
+    const handleCardClick = () => {
+        dispatch(setLot(lot));
+        navigate(`/trading-room/${lot.id}`);
+    };
 
     useEffect(() => {
         if (status === 'active' && initialTimeLeft > 0) {
@@ -55,7 +64,7 @@ export const LotsCard: React.FC<LotsCardProps> = ({ lot, onEdit }) => {
     };
 
     return (
-        <div className={styles.lotsCard}>
+        <div className={styles.lotsCard} onClick={handleCardClick}>
             <div className={styles.lotsCard__name}>{name}</div>
             <div className={styles.lotsCard__details}>
                 <span className={styles.lotsCard__term}>Term: {term}</span>
