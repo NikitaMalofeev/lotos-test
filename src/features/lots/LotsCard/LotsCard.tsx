@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './style.module.scss';
 import { useTimer } from '../../../shared/hooks/useTimer';
-import { Button, Space } from 'antd';
+import { Button, Space, message } from 'antd'; // Импортируем 'message' из 'antd'
 import { EditOutlined, DeleteOutlined, PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons';
 import { useAppDispatch } from '../../../shared/helpers/dispatch';
 import { deleteLotAsync, editLotStatus, updateLotStatusAsync } from '../../../entities/lots/slice/lotsSlice';
@@ -22,9 +22,18 @@ export const LotsCard: React.FC<LotsCardProps> = ({ lot, onEdit }) => {
 
     const navigate = useNavigate();
 
-    const handleCardClick = () => {
-        dispatch(setLot(lot));
-        navigate(`/trading-room/${lot.id}`);
+    const handleCardClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        // Предотвращаем выполнение, если клик был по кнопке
+        if ((event.target as HTMLElement).closest('button')) {
+            return;
+        }
+
+        if (status !== 'active') {
+            message.error('Вы не можете войти в неактивную торговую комнату.');
+        } else {
+            dispatch(setLot(lot));
+            navigate(`/trading-room/${lot.id}`);
+        }
     };
 
     useEffect(() => {
@@ -34,11 +43,13 @@ export const LotsCard: React.FC<LotsCardProps> = ({ lot, onEdit }) => {
         }
     }, [status, initialTimeLeft, startTimer]);
 
-    const handleDelete = () => {
+    const handleDelete = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
         dispatch(deleteLotAsync(id));
     };
 
-    const handleStartPause = () => {
+    const handleStartPause = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
         if (status !== 'active') {
             dispatch(editLotStatus({ id, status: 'active' }));
             dispatch(updateLotStatusAsync({ id, status: 'active' }));
@@ -50,6 +61,11 @@ export const LotsCard: React.FC<LotsCardProps> = ({ lot, onEdit }) => {
             dispatch(updateLotStatusAsync({ id, status: 'paused' }));
             setIsTimerRunning(false);
         }
+    };
+
+    const handleEdit = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
+        onEdit(lot);
     };
 
     const formatDate = (timestamp: number): string => {
@@ -67,21 +83,28 @@ export const LotsCard: React.FC<LotsCardProps> = ({ lot, onEdit }) => {
         <div className={styles.lotsCard} onClick={handleCardClick}>
             <div className={styles.lotsCard__name}>{name}</div>
             <div className={styles.lotsCard__details}>
-                <span className={styles.lotsCard__term}>Term: {term}</span>
-                <span className={styles.lotsCard__payment}>Payment: {payment}</span>
+                <span className={styles.lotsCard__term}>Срок: {term}</span>
+                <span className={styles.lotsCard__payment}>Платеж: {payment}</span>
                 <span className={styles.lotsCard__date}>
-                    Created At: {formatDate(startDate)}
+                    Создан: {formatDate(startDate)}
                 </span>
                 <span className={styles.lotsCard__timer}>
-                    Time Left: {formatTime(timeLeft)}
+                    Осталось времени: {formatTime(timeLeft)}
                 </span>
                 <Space className={styles.lotsCard__actions}>
-                    <Button icon={<EditOutlined />} onClick={() => onEdit(lot)} />
+                    <Button
+                        icon={<EditOutlined />}
+                        onClick={handleEdit}
+                    />
                     <Button
                         icon={isTimerRunning ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
                         onClick={handleStartPause}
                     />
-                    <Button icon={<DeleteOutlined />} danger onClick={handleDelete} />
+                    <Button
+                        icon={<DeleteOutlined />}
+                        danger
+                        onClick={handleDelete}
+                    />
                 </Space>
             </div>
         </div>

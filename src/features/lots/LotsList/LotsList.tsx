@@ -15,10 +15,13 @@ import { LotsCard } from '../LotsCard/LotsCard';
 import CreateLotDrawer from '../CreateLotDrawer/CreateLotDrawer';
 import EditLotDrawer from '../EditLotDrawer/EditLotDrawer';
 import { ILot } from '../../../entities/lots/model/lotsTypes';
+import { useAdminPermissions } from '../../../shared/hooks/useCheckPermissions';
 
 export const LotsList = () => {
     const dispatch = useAppDispatch();
     const { lots, createLotDrawerVisible, editLotDrawerVisible, selectedLot } = useSelector((state: RootState) => state.lots);
+
+    const hasAdminPermission = useAdminPermissions();
 
     useEffect(() => {
         dispatch(fetchLotsAsync());
@@ -42,16 +45,22 @@ export const LotsList = () => {
 
     return (
         <div className={styles.lotsList}>
-            {lots && lots.map((lot) => (
-                <div key={lot.id} className={styles.lotsList__item}>
-                    <LotsCard lot={lot} onEdit={handleShowEditLot} />
-                </div>
-            ))}
-            <Button onClick={handleShowCreateLot}>
+            {hasAdminPermission && <Button onClick={handleShowCreateLot} className={styles.lotsList__button_create}>
                 Create Lot
-            </Button>
-            <CreateLotDrawer visible={createLotDrawerVisible} onClose={handleHideCreateLot} />
-            <EditLotDrawer visible={editLotDrawerVisible} onClose={handleHideEditLot} />
+            </Button>}
+            <div className={styles.lotsList__container}>
+
+                {lots && lots.map((lot) => (
+                    <div key={lot.id} className={styles.lotsList__item}>
+                        <LotsCard lot={lot} onEdit={handleShowEditLot} />
+                    </div>
+                ))}
+
+                {/* Modal windows */}
+                <CreateLotDrawer visible={createLotDrawerVisible} onClose={handleHideCreateLot} />
+                <EditLotDrawer visible={editLotDrawerVisible} onClose={handleHideEditLot} />
+            </div>
         </div>
+
     );
 };

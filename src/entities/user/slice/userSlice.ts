@@ -1,14 +1,18 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+// userSlice.ts
+
+import { createSlice } from '@reduxjs/toolkit';
 import { IUser } from '../model/userTypes';
 
 export interface UserState {
     user: IUser | null;
+    users: IUser[];
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
 }
 
 const initialState: UserState = {
     user: null,
+    users: [],
     status: 'idle',
     error: null,
 };
@@ -22,6 +26,9 @@ const userSlice = createSlice({
             state.status = 'succeeded';
             state.error = null;
         },
+        setAllUsers: (state, action) => {
+            state.users = action.payload;
+        },
         setLoading: (state) => {
             state.status = 'loading';
             state.error = null;
@@ -33,5 +40,5 @@ const userSlice = createSlice({
     },
 });
 
-export const { setUser, setLoading, setError } = userSlice.actions;
+export const { setUser, setLoading, setError, setAllUsers } = userSlice.actions;
 export default userSlice.reducer;

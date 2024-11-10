@@ -1,38 +1,37 @@
-import React, { useState } from 'react';
-import { useAppDispatch } from '../../../shared/helpers/dispatch';
-import { Button, Drawer, Form, Input, Space } from 'antd';
-import { createLotAsync } from '../../../entities/lots/slice/lotsSlice';
+// UserLotDrawer.tsx
 
-interface CreateLotDrawerProps {
+import React from 'react';
+import { Button, Drawer, Form, Input, Space } from 'antd';
+import { useDispatch } from 'react-redux';
+import { updateUserLot } from '../../../entities/trading/slice/tradingSlice';
+
+interface UserLotDrawerProps {
     visible: boolean;
     onClose: () => void;
+    userId: string;
 }
 
-const CreateLotDrawer: React.FC<CreateLotDrawerProps> = ({ visible, onClose }) => {
+export const UserCreateLotDrawer: React.FC<UserLotDrawerProps> = ({ visible, onClose, userId }) => {
     const [form] = Form.useForm();
-    const dispatch = useAppDispatch();
+    const dispatch = useDispatch();
 
-    const handleCreateLot = async () => {
+    const handleSave = async () => {
         try {
             const values = await form.validateFields();
-            const newLot = {
-                name: values.name,
-                term: values.term,
-                payment: values.payment,
-                startDate: Math.floor(Date.now() / 1000),
-                timeLeft: 1800
+            const lotData = {
+                ...values,
             };
 
-            await dispatch(createLotAsync(newLot)).unwrap();
+            dispatch(updateUserLot({ userId, lotData }));
             onClose();
         } catch (err) {
-            console.error('Error creating lot or validation failed:', err);
+            console.error('Error saving user lot data or validation failed:', err);
         }
     };
 
     return (
         <Drawer
-            title="Create New Lot"
+            title="Enter Lot Data"
             closable={false}
             placement="right"
             open={visible}
@@ -40,8 +39,8 @@ const CreateLotDrawer: React.FC<CreateLotDrawerProps> = ({ visible, onClose }) =
         >
             <Form form={form} layout="vertical">
                 <Form.Item
-                    label="Name"
-                    name="name"
+                    label="Company"
+                    name="company"
                     rules={[{ required: true, message: 'Please enter the lot name' }]}
                 >
                     <Input placeholder="Enter lot name" />
@@ -62,8 +61,8 @@ const CreateLotDrawer: React.FC<CreateLotDrawerProps> = ({ visible, onClose }) =
                 </Form.Item>
                 <Form.Item>
                     <Space>
-                        <Button type="primary" onClick={handleCreateLot}>
-                            Create Lot
+                        <Button type="primary" onClick={handleSave}>
+                            Save
                         </Button>
                         <Button onClick={onClose}>Cancel</Button>
                     </Space>
@@ -73,4 +72,3 @@ const CreateLotDrawer: React.FC<CreateLotDrawerProps> = ({ visible, onClose }) =
     );
 };
 
-export default CreateLotDrawer;

@@ -14,5 +14,5 @@ export type ITradingMember = {
     company: string,
     role: string,
     id: string,
-    lot: ILot
+    lot: Partial<ILot>;
 }

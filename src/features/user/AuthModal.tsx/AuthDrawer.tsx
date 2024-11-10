@@ -1,7 +1,9 @@
+// AuthDrawer.tsx
+
 import React, { useState } from 'react';
-import { authenticateUserThunk } from '../../../entities/user/thunk/authentificateUserThunk';
 import { useAppDispatch } from '../../../shared/helpers/dispatch';
 import { Button, Drawer, Form, Input, Space } from 'antd';
+import { authenticateUserThunk } from '../../../entities/user/thunk/authentificateUserThunk';
 
 export interface AuthDrawerProps {
     visible: boolean;
@@ -17,6 +19,7 @@ const AuthDrawer: React.FC<AuthDrawerProps> = ({ visible }) => {
             await dispatch(authenticateUserThunk({ name, password })).unwrap();
         } catch (err) {
             // Обработка ошибок
+            // Вы можете добавить сообщение об ошибке для пользователя
         }
     };
 

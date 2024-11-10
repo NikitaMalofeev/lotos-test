@@ -6,18 +6,21 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     min-width: 200px;
     transition: box-shadow 0.3s;
+    cursor: pointer;
 
     &:hover {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     &__name {
+        font-family: "Montserrat", sans-serif;
         font-size: 1.2rem;
         font-weight: bold;
         margin-bottom: 8px;
     }
 
     &__details {
+        font-family: "Montserrat", sans-serif;
         font-size: 0.9rem;
         color: #555;
 
@@ -30,6 +33,7 @@
     &__term,
     &__payment,
     &__date {
+        font-family: "Montserrat", sans-serif;
         font-size: 0.9rem;
     }
 }

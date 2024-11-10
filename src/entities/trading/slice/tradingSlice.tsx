@@ -18,7 +18,7 @@ const initialState: TradingRoomState = {
     lot: null,
     users: [
         {
-            id: '1',
+            id: '11',
             name: 'John Doe',
             avatar: 'https://example.com/avatar1.jpg',
             company: 'Company A',
@@ -26,7 +26,7 @@ const initialState: TradingRoomState = {
             lot: null as any, // Мы инициализируем позже
         },
         {
-            id: '2',
+            id: '12',
             name: 'Jane Smith',
             avatar: 'https://example.com/avatar2.jpg',
             company: 'Company B',
@@ -61,23 +61,24 @@ const tradingRoomSlice = createSlice({
                         id: '1',
                         name: 'John Doe',
                         avatar: 'https://example.com/avatar1.jpg',
-                        company: 'Company A',
-                        role: 'Buyer',
+                        company: 'ООО Газпром',
+                        role: 'user',
                         lot: state.lot,
                     },
                     {
                         id: '2',
                         name: 'Jane Smith',
                         avatar: 'https://example.com/avatar2.jpg',
-                        company: 'Company B',
-                        role: 'Seller',
+                        company: 'ОАО ГОРТЕХСТРОЙ',
+                        role: 'user',
                         lot: state.lot,
                     },
                 ];
             }
         },
         addUser(state, action: PayloadAction<ITradingMember>) {
-            state.users.push(action.payload);
+            const newUser = { ...action.payload, lot: action.payload.lot || {} };
+            state.users.unshift(newUser);
         },
         setCurrentUserIndex(state, action: PayloadAction<number>) {
             state.currentUserIndex = action.payload;
@@ -90,12 +91,20 @@ const tradingRoomSlice = createSlice({
         },
         moveToNextUser(state) {
             state.currentUserIndex = (state.currentUserIndex + 1) % state.users.length;
-            state.timeLeft = 15; // Сбрасываем таймер на 15 секунд
+            state.timeLeft = 15;
         },
         updateUserPayment(state, action: PayloadAction<{ userId: string; payment: string }>) {
             state.users = state.users.map((user) =>
                 user.id === action.payload.userId
                     ? { ...user, lot: { ...user.lot, payment: action.payload.payment } }
+                    : user
+            );
+        },
+        updateUserLot(state, action: PayloadAction<{ userId: string; lotData: Partial<ILot> }>) {
+            const { userId, lotData } = action.payload;
+            state.users = state.users.map((user) =>
+                user.id === userId
+                    ? { ...user, lot: { ...user.lot, ...lotData } }
                     : user
             );
         },
@@ -121,6 +130,7 @@ export const {
     updateUserPayment,
     setError,
     setLoading,
+    updateUserLot,
 } = tradingRoomSlice.actions;
 
 export default tradingRoomSlice.reducer;
