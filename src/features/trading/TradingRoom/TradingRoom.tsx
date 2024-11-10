@@ -135,8 +135,11 @@ const TradingRoom = () => {
         dispatch(updateUserPayment({ userId, payment: value }));
     };
 
+    // здесь можно было бы достать хост из параметров билдера например через docker
+    // const frontendHost = https://nikitamalofeev.github.io/lotos-test/
+
     const inviteUser = () => {
-        const link = `http://localhost:3000/trading-room/${lotId}?userId=${inviteUserId}`;
+        const link = `https://nikitamalofeev.github.io/lotos-test/trading-room/${lotId}?userId=${inviteUserId}`;
 
         navigator.clipboard
             .writeText(link)
