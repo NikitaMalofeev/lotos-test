@@ -135,10 +135,10 @@ const TradingRoom = () => {
     };
 
     // здесь можно было бы достать хост из параметров билдера например через docker
-    // const frontendHost = https://nikitamalofeev.github.io/lotos-test/
+    // const frontendHost = https://lotos-test-exchange.netlify.app/
 
     const inviteUser = () => {
-        const link = `https://nikitamalofeev.github.io/lotos-test/trading-room/${lotId}?userId=${inviteUserId}`;
+        const link = `https://lotos-test-exchange.netlify.app/trading-room/${lotId}?userId=${inviteUserId}`;
 
         navigator.clipboard
             .writeText(link)
