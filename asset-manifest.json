@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/lotos-test/static/css/main.66b2a868.css",
+    "main.js": "/lotos-test/static/js/main.65b86343.js",
+    "index.html": "/lotos-test/index.html",
+    "main.66b2a868.css.map": "/lotos-test/static/css/main.66b2a868.css.map",
+    "main.65b86343.js.map": "/lotos-test/static/js/main.65b86343.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.66b2a868.css",
+    "static/js/main.65b86343.js"
+  ]
+}
