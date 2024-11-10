@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAppDispatch } from '../../../shared/helpers/dispatch';
 import { Button, Drawer, Form, Input, Space } from 'antd';
 import { createLotAsync } from '../../../entities/lots/slice/lotsSlice';

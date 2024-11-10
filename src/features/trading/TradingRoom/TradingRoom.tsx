@@ -4,7 +4,6 @@ import { Table, Button, Input, message } from 'antd';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../app/store/store';
 import {
-    setLot,
     initializeUsers,
     addUser,
     setInviteUserId,

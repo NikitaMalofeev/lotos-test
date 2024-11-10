@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { getLotsFromApi } from '../../../shared/api/lots/getLotsFromApi';
 import { ILot } from '../model/lotsTypes';
-import { useAppDispatch } from '../../../shared/helpers/dispatch';
 import { createLotFromApi } from '../../../shared/api/lots/createLotFromApi';
 import { deleteLotFromApi } from '../../../shared/api/lots/deleteLotFromApi';
 import { updateLotFromApi } from '../../../shared/api/lots/updateLotFromApi';

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import styles from './styles.module.scss';
 import { useAppDispatch } from '../../../shared/helpers/dispatch';
 import {
@@ -19,7 +19,7 @@ import { useAdminPermissions } from '../../../shared/hooks/useCheckPermissions';
 
 export const LotsList = () => {
     const dispatch = useAppDispatch();
-    const { lots, createLotDrawerVisible, editLotDrawerVisible, selectedLot } = useSelector((state: RootState) => state.lots);
+    const { lots, createLotDrawerVisible, editLotDrawerVisible } = useSelector((state: RootState) => state.lots);
 
     const hasAdminPermission = useAdminPermissions();
 
