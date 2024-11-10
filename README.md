@@ -1,46 +1,25 @@
-# Getting Started with Create React App
+Спасибо за интересное тестовое задание!) тут небольшая инструкция и комментарии по моей работе
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+1. Инструкция
 
-## Available Scripts
+  - В mocApi базе данных существует 7 пользователей, 1 админ с name: 10 password: 10 для админских функций используйте его 
+  и также пользователи 3-6 name и id
 
-In the project directory, you can run:
+  - Вы можете использовать весь функционал указанный в тестовом задании и даже больше, с одним ограничением, 
+  нельзя открыть 2х пользователей на разных страницах в одной комнате, так как работа с торговой комнатой организована в live режиме через localstorage,
+  так как не было возможности сделать базу данных с вебсокетом. Но вы можете например открыть 1 вкладка - админ, 2 вкладка - юзер и проверить live режим изменения данных
+  Вы можете изменять параметры торгов, начинать и останавливать их без ограничений
 
-### `npm start`
+  - Чтобы добавить пользователя в комнату введите его имя 3-6 и наэмите пригласить, откройте в этой-же или соседней вкладке для входа участника в комнату
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+2. Комментарии по улучшениям
+   - Первое и самое важное конечно изменить логику работы торговой комнаты с redux и LS на redux и websocket, а лучше просто SSE, чтобы после изменения хода или handleChange параметров торгов изменять с бека и обновлять redux из ответа сервера
+   - Декомпозировать некоторые элементы, в особенности также торговую комнату разделить на 2 виджета для пользователя и для админа, сделать protect-routing для функций администратора
+   - Я странным образом организовал аутентификацию просто запрашивая всех пользователей с сервера с их данными, в коммерческом проекте естественно я бы так не делал и с бекендером организовал бы безопасную и оптимизированную авторизацию, желательно OAuth + JWT
+   - возможно изменение работы с модальными окнами как это сделано в tradingSlice с разными типами окон для лучшего хранения данных 
+  
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+3. Стек
+   - Для работы с данными в приложении я использовал redux, async/thunk, middleware, localstorage, mocApi БД, локальные состояния
+   - Основной стек React, Typescript, Redux, antd
