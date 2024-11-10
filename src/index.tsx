@@ -11,7 +11,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter basename='https://nikitamalofeev.github.io/lotos-test'>
+      <BrowserRouter>
         <App />
       </BrowserRouter>
     </Provider>
