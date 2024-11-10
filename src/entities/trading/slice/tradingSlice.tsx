@@ -2,7 +2,6 @@ import { createSlice, PayloadAction, createAction } from '@reduxjs/toolkit';
 import { ILot } from '../../lots/model/lotsTypes';
 import { ITradingMember } from '../../user/model/userTypes';
 
-// Определение действия за пределами слайса
 export const setTradingRoomState = createAction<TradingRoomState>('tradingRoom/setTradingRoomState');
 
 export interface TradingRoomState {
@@ -27,7 +26,7 @@ const initialState: TradingRoomState = {
     lot: null,
     users: [],
     currentUserIndex: 0,
-    timeLeft: 15, // 15 секунд
+    timeLeft: 30,
     inviteUserId: '',
     status: 'idle',
     error: null,
@@ -83,7 +82,7 @@ const tradingRoomSlice = createSlice({
         },
         moveToNextUser(state) {
             state.currentUserIndex = (state.currentUserIndex + 1) % state.users.length;
-            state.timeLeft = 15;
+            state.timeLeft = 30;
             if (state.lot) {
                 state.lot.lastPrice = state.lot.payment
             }
@@ -123,7 +122,6 @@ const tradingRoomSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(setTradingRoomState, (state, action) => {
-            // Обновляем состояние только, если пользователи присутствуют
             if (action.payload.users.length > 0) {
                 state.lot = action.payload.lot;
                 state.users = action.payload.users;

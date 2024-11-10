@@ -18,8 +18,6 @@ const AuthDrawer: React.FC<AuthDrawerProps> = ({ visible }) => {
         try {
             await dispatch(authenticateUserThunk({ name, password })).unwrap();
         } catch (err) {
-            // Обработка ошибок
-            // Вы можете добавить сообщение об ошибке для пользователя
         }
     };
 

@@ -184,7 +184,6 @@ const TradingRoom = () => {
                         const lastPriceStr = user.lot.lastPrice || '0';
                         const newPriceStr = user.lot.payment || lastPriceStr;
 
-                        // Convert strings to numbers
                         const lastPriceValue = parseFloat(lastPriceStr.replace(',', '.'));
                         const newPriceValue = parseFloat(newPriceStr.replace(',', '.'));
 

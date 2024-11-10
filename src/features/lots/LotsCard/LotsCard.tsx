@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import styles from './style.module.scss';
 import { useTimer } from '../../../shared/hooks/useTimer';
-import { Button, Space, message } from 'antd'; // Импортируем 'message' из 'antd'
+import { Button, Space, message } from 'antd';
 import { EditOutlined, DeleteOutlined, PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons';
 import { useAppDispatch } from '../../../shared/helpers/dispatch';
 import { deleteLotAsync, editLotStatus, updateLotStatusAsync } from '../../../entities/lots/slice/lotsSlice';
 import { ILot } from '../../../entities/lots/model/lotsTypes';
 import { useNavigate } from 'react-router-dom';
 import { setLot } from '../../../entities/trading/slice/tradingSlice';
+import { useAdminPermissions } from '../../../shared/hooks/useCheckPermissions';
 
 interface LotsCardProps {
     lot: ILot;
@@ -19,6 +20,7 @@ export const LotsCard: React.FC<LotsCardProps> = ({ lot, onEdit }) => {
     const { timeLeft, startTimer, stopTimer } = useTimer(initialTimeLeft);
     const dispatch = useAppDispatch();
     const [isTimerRunning, setIsTimerRunning] = useState(status === 'active');
+    const hasAdminPermission = useAdminPermissions();
 
     const navigate = useNavigate();
 
@@ -90,21 +92,24 @@ export const LotsCard: React.FC<LotsCardProps> = ({ lot, onEdit }) => {
                 <span className={styles.lotsCard__timer}>
                     Осталось времени: {formatTime(timeLeft)}
                 </span>
-                <Space className={styles.lotsCard__actions}>
-                    <Button
-                        icon={<EditOutlined />}
-                        onClick={handleEdit}
-                    />
-                    <Button
-                        icon={isTimerRunning ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
-                        onClick={handleStartPause}
-                    />
-                    <Button
-                        icon={<DeleteOutlined />}
-                        danger
-                        onClick={handleDelete}
-                    />
-                </Space>
+                {hasAdminPermission && (
+                    <Space className={styles.lotsCard__actions}>
+                        <Button
+                            icon={<EditOutlined />}
+                            onClick={handleEdit}
+                        />
+                        <Button
+                            icon={isTimerRunning ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+                            onClick={handleStartPause}
+                        />
+                        <Button
+                            icon={<DeleteOutlined />}
+                            danger
+                            onClick={handleDelete}
+                        />
+                    </Space>
+                )}
+
             </div>
         </div>
     );

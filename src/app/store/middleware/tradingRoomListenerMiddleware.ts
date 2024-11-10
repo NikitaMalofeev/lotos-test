@@ -8,7 +8,6 @@ const tradingRoomListenerMiddleware = createListenerMiddleware();
 
 tradingRoomListenerMiddleware.startListening({
     predicate: (action, currentState, previousState) => {
-        // Отслеживаем действия, изменяющие состояние tradingRoom
         return action.type.startsWith('tradingRoom/');
     },
     effect: (action, listenerApi) => {
