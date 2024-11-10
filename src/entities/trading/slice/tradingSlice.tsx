@@ -84,6 +84,9 @@ const tradingRoomSlice = createSlice({
         moveToNextUser(state) {
             state.currentUserIndex = (state.currentUserIndex + 1) % state.users.length;
             state.timeLeft = 15;
+            if (state.lot) {
+                state.lot.lastPrice = state.lot.payment
+            }
         },
         updateUserPayment(state, action: PayloadAction<{ userId: string; payment: string }>) {
             state.users = state.users.map((user) =>

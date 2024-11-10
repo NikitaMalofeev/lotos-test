@@ -20,6 +20,7 @@ export const UserCreateLotDrawer: React.FC<UserLotDrawerProps> = ({ visible, onC
             const values = await form.validateFields();
             const lotData = {
                 ...values,
+                lastPrice: values.payment,
             };
 
             dispatch(updateUserLot({ userId, lotData }));

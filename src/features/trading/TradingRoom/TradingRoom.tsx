@@ -170,7 +170,7 @@ const TradingRoom = () => {
                 if (record.key === 'payment') {
                     if (
                         user.id === currentUserId &&
-                        users[currentUserIndex].id === currentUserId &&
+                        users[currentUserIndex]?.id === currentUserId &&
                         lot?.status === 'active'
                     ) {
                         return (
@@ -182,7 +182,31 @@ const TradingRoom = () => {
                             />
                         );
                     } else {
-                        return (user.lot.payment || '') + ' руб.';
+                        const lastPriceStr = user.lot.lastPrice || '0';
+                        const newPriceStr = user.lot.payment || lastPriceStr;
+
+                        // Convert strings to numbers
+                        const lastPriceValue = parseFloat(lastPriceStr.replace(',', '.'));
+                        const newPriceValue = parseFloat(newPriceStr.replace(',', '.'));
+
+                        if (!isNaN(lastPriceValue) && !isNaN(newPriceValue)) {
+                            const difference = newPriceValue - lastPriceValue;
+                            const differenceSign = difference > 0 ? '+' : '';
+                            const differenceColor = difference > 0 ? 'green' : 'red';
+
+                            return (
+                                <div>
+                                    {newPriceStr} руб.
+                                    <br />
+                                    <span style={{ color: differenceColor }}>
+                                        {differenceSign}
+                                        {difference.toFixed(2)} руб.
+                                    </span>
+                                </div>
+                            );
+                        } else {
+                            return `${newPriceStr} руб.`;
+                        }
                     }
                 } else if (record.key === 'company') {
                     return user.company;
@@ -225,10 +249,15 @@ const TradingRoom = () => {
 
     const currentUserId = user ? user.id : null;
 
+    console.log('currentUserId:', currentUserId);
+    console.log('users[currentUserIndex]?.id:', users[currentUserIndex]?.id);
+    console.log('users:', users);
+    console.log('currentUserIndex:', currentUserIndex);
+
     return (
         <div>
             <AuthDrawer visible={!user} />
-            {user && (
+            {user && !hasAdminPermission && (
                 <UserCreateLotDrawer
                     userId={user?.id}
                     visible={exchangeDrawer.userCreate}
