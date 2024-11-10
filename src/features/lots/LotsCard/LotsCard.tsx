@@ -23,7 +23,6 @@ export const LotsCard: React.FC<LotsCardProps> = ({ lot, onEdit }) => {
     const navigate = useNavigate();
 
     const handleCardClick = (event: React.MouseEvent<HTMLDivElement>) => {
-        // Предотвращаем выполнение, если клик был по кнопке
         if ((event.target as HTMLElement).closest('button')) {
             return;
         }

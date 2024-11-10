@@ -1,6 +1,4 @@
-// TradingRoom.tsx
-
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { Table, Button, Input, message } from 'antd';
 import { useSelector } from 'react-redux';
@@ -14,20 +12,22 @@ import {
     setTimeLeft,
     updateUserPayment,
     setTradingRoomState,
+    setExchangeDrawer,
 } from '../../../entities/trading/slice/tradingSlice';
 import AuthDrawer from '../../../features/user/AuthModal.tsx/AuthDrawer';
 import { fetchLotsAsync } from '../../../entities/lots/slice/lotsSlice';
 import { useAppDispatch } from '../../../shared/helpers/dispatch';
 import { UserCreateLotDrawer } from '../UserCreateLotDrawer/UserCreateLotDrawer';
 import { loadTradingRoomStateFromLocalStorage } from '../../../shared/utils/saveEchangeStateFromLS';
+import { CloseTradeDrawer } from '../CloseTradeDrawer/CloseTradeDrawer';
+import { useAdminPermissions } from '../../../shared/hooks/useCheckPermissions';
 
 const TradingRoom = () => {
     const { lotId } = useParams<{ lotId: string }>();
     const location = useLocation();
     const dispatch = useAppDispatch();
     const timerRef = useRef<NodeJS.Timeout | null>(null);
-    const [authVisible, setAuthVisible] = useState(false);
-    const [userLotDrawerVisible, setUserLotDrawerVisible] = useState(false);
+    const hasAdminPermission = useAdminPermissions();
 
     const {
         lot,
@@ -35,33 +35,33 @@ const TradingRoom = () => {
         currentUserIndex,
         timeLeft,
         inviteUserId,
+        exchangeDrawer,
+        finalOffer,
     } = useSelector((state: RootState) => state.tradingRoom);
 
     const user = useSelector((state: RootState) => state.user.user);
     const lotsStatus = useSelector((state: RootState) => state.lots.status);
     const lots = useSelector((state: RootState) => state.lots.lots);
 
-    // Управление видимостью AuthDrawer
     useEffect(() => {
-        setAuthVisible(!user);
+        if (!user) {
+            dispatch(setExchangeDrawer({ userCreate: true }));
+        }
     }, [user]);
 
-    // Загрузка лотов с сервера, если они еще не загружены
     useEffect(() => {
         if (lotsStatus === 'idle') {
             dispatch(fetchLotsAsync());
         }
     }, [lotsStatus]);
 
-    // Получение лота из хранилища
     const lotFromStore = lots.find((l) => l.id === lotId);
 
-    // Ref для отслеживания загрузки состояния
     const stateLoaded = useRef(false);
 
-    // Загрузка сохраненного состояния или инициализация
     useEffect(() => {
         if (lotFromStore) {
+            dispatch(setLot(lotFromStore));
             const savedState = loadTradingRoomStateFromLocalStorage(lotFromStore.id);
             if (savedState) {
                 dispatch(setTradingRoomState(savedState));
@@ -82,16 +82,13 @@ const TradingRoom = () => {
             }
         };
 
-        // Добавляем обработчик события
         window.addEventListener('storage', handleStorageChange);
 
-        // Удаляем обработчик при размонтировании компонента
         return () => {
             window.removeEventListener('storage', handleStorageChange);
         };
     }, [lotId]);
 
-    // Обработка userId из URL и добавление пользователя
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const userIdParam = params.get('userId');
@@ -109,7 +106,7 @@ const TradingRoom = () => {
                         lot: {},
                     };
                     dispatch(addUser(newUser));
-                    setUserLotDrawerVisible(true);
+                    dispatch(setExchangeDrawer({ userCreate: true }));
                 }
             } else {
                 message.error('Вы должны войти под приглашённым пользователем.');
@@ -117,7 +114,6 @@ const TradingRoom = () => {
         }
     }, [location.search, lot, user]);
 
-    // Таймер для переключения хода
     useEffect(() => {
         if (lot?.status === 'active') {
             if (timerRef.current) clearInterval(timerRef.current);
@@ -152,6 +148,10 @@ const TradingRoom = () => {
             .catch(() => {
                 message.error('Не удалось скопировать ссылку.');
             });
+    };
+
+    const handleOpenCloseTradeDrawer = () => {
+        dispatch(setExchangeDrawer({ endLot: true }));
     };
 
     const columns = [
@@ -193,7 +193,6 @@ const TradingRoom = () => {
         })),
     ];
 
-
     const data = [
         {
             key: 'company',
@@ -216,7 +215,6 @@ const TradingRoom = () => {
         dispatch(moveToNextUser());
     };
 
-    // Форматирование времени
     const formatTime = (seconds: number) => {
         const min = Math.floor(seconds / 60)
             .toString()
@@ -225,31 +223,33 @@ const TradingRoom = () => {
         return `${min}:${sec}`;
     };
 
-    // Идентификатор текущего пользователя
     const currentUserId = user ? user.id : null;
-
-    // if (!lot || users.length === 0) {
-    //     return <div>Loading...</div>;
-    // }
 
     return (
         <div>
-            <AuthDrawer visible={authVisible} />
+            <AuthDrawer visible={!user} />
             {user && (
                 <UserCreateLotDrawer
-                    visible={userLotDrawerVisible}
-                    onClose={() => setUserLotDrawerVisible(false)}
                     userId={user?.id}
+                    visible={exchangeDrawer.userCreate}
+                    onClose={() => {
+                        dispatch(setExchangeDrawer({ userCreate: false }));
+                    }}
                 />
             )}
+            <CloseTradeDrawer />
             <h1>Торговая комната для лота {lot?.name}</h1>
-            <Input
-                placeholder="Введите ID пользователя для приглашения"
-                value={inviteUserId}
-                onChange={(e) => dispatch(setInviteUserId(e.target.value))}
-                style={{ maxWidth: 200, marginRight: 10 }}
-            />
-            <Button onClick={inviteUser}>Пригласить пользователя</Button>
+            {hasAdminPermission && (
+                <>
+                    <Input
+                        placeholder="Введите ID пользователя для приглашения"
+                        value={inviteUserId}
+                        onChange={(e) => dispatch(setInviteUserId(e.target.value))}
+                        style={{ maxWidth: 200, marginRight: 10 }}
+                    />
+                    <Button onClick={inviteUser}>Пригласить пользователя</Button>
+                </>
+            )}
             {lot?.status === 'active' && (
                 <div>
                     <p>Ход пользователя: {users[currentUserIndex]?.name}</p>
@@ -262,6 +262,24 @@ const TradingRoom = () => {
                 </div>
             )}
             <Table columns={columns} dataSource={data} pagination={false} />
+            {lot?.status === 'active' && hasAdminPermission && (
+                <Button
+                    type="primary"
+                    onClick={handleOpenCloseTradeDrawer}
+                    style={{ marginTop: '20px' }}
+                >
+                    Закрыть торги
+                </Button>
+            )}
+            {lot?.status === 'paused' && finalOffer && (
+                <div>
+                    <h2>Торги завершены</h2>
+                    <p>
+                        Победитель: {users.find((u) => u.id === finalOffer.userId)?.name || 'Неизвестно'}
+                    </p>
+                    <p>Конечная сумма{users.find((u) => u.id === finalOffer.userId)?.name}: {finalOffer.payment} руб.</p>
+                </div>
+            )}
         </div>
     );
 };
