@@ -61,7 +61,6 @@ const TradingRoom = () => {
 
     useEffect(() => {
         if (lotFromStore) {
-            dispatch(setLot(lotFromStore));
             const savedState = loadTradingRoomStateFromLocalStorage(lotFromStore.id);
             if (savedState) {
                 dispatch(setTradingRoomState(savedState));
