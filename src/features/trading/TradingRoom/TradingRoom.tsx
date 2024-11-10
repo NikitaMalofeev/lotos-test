@@ -46,13 +46,13 @@ const TradingRoom = () => {
         if (!user) {
             dispatch(setExchangeDrawer({ userCreate: true }));
         }
-    }, [user]);
+    }, [user, dispatch]);
 
     useEffect(() => {
         if (lotsStatus === 'idle') {
             dispatch(fetchLotsAsync());
         }
-    }, [lotsStatus]);
+    }, [lotsStatus, dispatch]);
 
     const lotFromStore = lots.find((l) => l.id === lotId);
 
@@ -68,7 +68,7 @@ const TradingRoom = () => {
             }
             stateLoaded.current = true;
         }
-    }, [lotFromStore]);
+    }, [lotFromStore, dispatch]);
 
     useEffect(() => {
         const handleStorageChange = (event: StorageEvent) => {
@@ -85,7 +85,7 @@ const TradingRoom = () => {
         return () => {
             window.removeEventListener('storage', handleStorageChange);
         };
-    }, [lotId]);
+    }, [lotId, dispatch]);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -110,7 +110,7 @@ const TradingRoom = () => {
                 message.error('Вы должны войти под приглашённым пользователем.');
             }
         }
-    }, [location.search, lot, user]);
+    }, [location.search, lot, user, dispatch]);
 
     useEffect(() => {
         if (lot?.status === 'active') {
@@ -128,7 +128,7 @@ const TradingRoom = () => {
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
         };
-    }, [lot?.status, timeLeft]);
+    }, [lot?.status, timeLeft, dispatch]);
 
     const handlePaymentChange = (userId: string, value: string) => {
         dispatch(updateUserPayment({ userId, payment: value }));
