@@ -84,7 +84,7 @@ export const LotsCard: React.FC<LotsCardProps> = ({ lot, onEdit }) => {
             <div className={styles.lotsCard__name}>{name}</div>
             <div className={styles.lotsCard__details}>
                 <span className={styles.lotsCard__term}>Срок: {term}</span>
-                <span className={styles.lotsCard__payment}>Платеж: {payment}</span>
+                <span className={styles.lotsCard__payment}>Платеж: {payment} руб.</span>
                 <span className={styles.lotsCard__date}>
                     Создан: {formatDate(startDate)}
                 </span>

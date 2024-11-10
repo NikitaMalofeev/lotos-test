@@ -1,14 +1,15 @@
-// tradingRoomSlice.ts
-
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createAction } from '@reduxjs/toolkit';
 import { ILot } from '../../lots/model/lotsTypes';
 import { ITradingMember } from '../../user/model/userTypes';
 
-interface TradingRoomState {
+// Define the action outside the slice
+export const setTradingRoomState = createAction<TradingRoomState>('tradingRoom/setTradingRoomState');
+
+export interface TradingRoomState {
     lot: ILot | null;
     users: ITradingMember[];
     currentUserIndex: number;
-    timeLeft: number; // in seconds
+    timeLeft: number;
     inviteUserId: string;
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
@@ -16,26 +17,9 @@ interface TradingRoomState {
 
 const initialState: TradingRoomState = {
     lot: null,
-    users: [
-        {
-            id: '11',
-            name: 'John Doe',
-            avatar: 'https://example.com/avatar1.jpg',
-            company: 'Company A',
-            role: 'Buyer',
-            lot: null as any, // Мы инициализируем позже
-        },
-        {
-            id: '12',
-            name: 'Jane Smith',
-            avatar: 'https://example.com/avatar2.jpg',
-            company: 'Company B',
-            role: 'Seller',
-            lot: null as any,
-        },
-    ],
+    users: [],
     currentUserIndex: 0,
-    timeLeft: 15, // 15 секунд
+    timeLeft: 15, // 15 seconds
     inviteUserId: '',
     status: 'idle',
     error: null,
@@ -47,11 +31,6 @@ const tradingRoomSlice = createSlice({
     reducers: {
         setLot(state, action: PayloadAction<ILot>) {
             state.lot = action.payload;
-            // Обновляем lot у каждого пользователя
-            state.users = state.users.map((user) => ({
-                ...user,
-                lot: action.payload,
-            }));
             state.status = 'succeeded';
         },
         initializeUsers(state) {
@@ -63,7 +42,7 @@ const tradingRoomSlice = createSlice({
                         avatar: 'https://example.com/avatar1.jpg',
                         company: 'ООО Газпром',
                         role: 'user',
-                        lot: state.lot,
+                        lot: { ...state.lot },
                     },
                     {
                         id: '2',
@@ -71,7 +50,7 @@ const tradingRoomSlice = createSlice({
                         avatar: 'https://example.com/avatar2.jpg',
                         company: 'ОАО ГОРТЕХСТРОЙ',
                         role: 'user',
-                        lot: state.lot,
+                        lot: { ...state.lot },
                     },
                 ];
             }
@@ -103,9 +82,7 @@ const tradingRoomSlice = createSlice({
         updateUserLot(state, action: PayloadAction<{ userId: string; lotData: Partial<ILot> }>) {
             const { userId, lotData } = action.payload;
             state.users = state.users.map((user) =>
-                user.id === userId
-                    ? { ...user, lot: { ...user.lot, ...lotData } }
-                    : user
+                user.id === userId ? { ...user, lot: { ...user.lot, ...lotData } } : user
             );
         },
         setError(state, action: PayloadAction<string>) {
@@ -116,6 +93,39 @@ const tradingRoomSlice = createSlice({
             state.status = 'loading';
             state.error = null;
         },
+    },
+    extraReducers: (builder) => {
+        builder.addCase(setTradingRoomState, (state, action) => {
+            // Only update state if users are present
+            if (action.payload.users.length > 0) {
+                state.lot = action.payload.lot;
+                state.users = action.payload.users;
+                state.status = action.payload.status;
+                state.error = action.payload.error;
+            } else {
+                state.users =
+                    state.users.length === 0
+                        ? [
+                            {
+                                id: '1',
+                                name: 'John Doe',
+                                avatar: 'https://example.com/avatar1.jpg',
+                                company: 'ООО Газпром',
+                                role: 'user',
+                                lot: { ...state.lot },
+                            },
+                            {
+                                id: '2',
+                                name: 'Jane Smith',
+                                avatar: 'https://example.com/avatar2.jpg',
+                                company: 'ОАО ГОРТЕХСТРОЙ',
+                                role: 'user',
+                                lot: { ...state.lot },
+                            },
+                        ]
+                        : state.users;
+            }
+        });
     },
 });
 
