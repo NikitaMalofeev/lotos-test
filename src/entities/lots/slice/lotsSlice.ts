@@ -29,7 +29,6 @@ const initialState: LotsState = {
 export const fetchLotsAsync = createAsyncThunk('lots/fetchLots', async (_, { dispatch }) => {
     const data = await getLotsFromApi();
     dispatch(setLots(data));
-    console.log(data);
     return data;
 });
 

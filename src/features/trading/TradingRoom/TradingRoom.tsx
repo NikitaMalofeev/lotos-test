@@ -250,11 +250,6 @@ const TradingRoom = () => {
 
     const currentUserId = user ? user.id : null;
 
-    console.log('currentUserId:', currentUserId);
-    console.log('users[currentUserIndex]?.id:', users[currentUserIndex]?.id);
-    console.log('users:', users);
-    console.log('currentUserIndex:', currentUserIndex);
-
     return (
         <div>
             <AuthDrawer visible={!user} />

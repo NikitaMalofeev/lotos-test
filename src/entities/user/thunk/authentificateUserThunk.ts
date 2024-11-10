@@ -13,8 +13,6 @@ export const authenticateUserThunk = createAsyncThunk(
 
             const user = users.find((u: { name: string, password: string }) => u.name === name && u.password === password);
             dispatch(setAllUsers(users));
-            console.log(users)
-            console.log(user)
             if (user) {
                 dispatch(setUser(user));
                 return user;
