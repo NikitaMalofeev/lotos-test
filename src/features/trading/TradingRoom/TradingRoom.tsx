@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { Table, Button, Input, message } from 'antd';
 import { useSelector } from 'react-redux';
@@ -110,7 +110,7 @@ const TradingRoom = () => {
                 message.error('Вы должны войти под приглашённым пользователем.');
             }
         }
-    }, [location.search, lot, user, dispatch]);
+    }, [location.search, lot, user, users, dispatch]);
 
     useEffect(() => {
         if (lot?.status === 'active') {
